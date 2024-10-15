@@ -11,13 +11,16 @@ public class Appear {
 
     private String firstName;
     private String lastName;
+    @Column(unique = true, nullable = false)
     private String email;
     private String phone;
     private String firmName;
     private String profession;
     private String subCategory;
     private String address;
+    @Column(nullable = false)
     private String password;
+    private String passwordConfirm;
     private boolean verified;
     private String verificationToken;
     private String resetToken;
@@ -36,6 +39,7 @@ public class Appear {
         this.address = address;
         this.password = password;
     }
+
     public Long getId() {
         return id;
     }
@@ -95,5 +99,39 @@ public class Appear {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+// Verification
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
+
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
     }
 }
