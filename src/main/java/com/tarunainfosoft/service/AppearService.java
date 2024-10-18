@@ -2,10 +2,12 @@ package com.tarunainfosoft.service;
 
 import com.tarunainfosoft.entity.Appear;
 import com.tarunainfosoft.repository.AppearRepository;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +28,7 @@ public class AppearService {
 
     private final Map<String, Appear> pendingUsers = new HashMap<>();
 
-    public String registerUser(Appear appear) {    //register appear
+    public String registerUser(Appear appear) throws MessagingException, UnsupportedEncodingException {    //register appear
 
         if(appearRepository.findByEmail(appear.getEmail()).isPresent()) {
             throw new IllegalArgumentException("User already exists with same email");
@@ -53,13 +55,14 @@ public class AppearService {
         return false;
     }
 
-    public Appear loginUser(String email, String password) {
+    public Optional<Appear> loginUser(String email, String password) {
         Optional<Appear> user = appearRepository.findByEmail(email);
-        if (user.isPresent() && user.get().getPassword().equals(password)) {
-            return user.get();   // Return the user if email and password match
+        if(user.isPresent() && user.get().getPassword().equals(password) && user.get().isVerified()) {
+            return user;
         }
-        return user.orElse(null);    //return null if user not found
+        return Optional.empty();
     }
+
     public void delete(Appear appear) {    //delete appear
         appearRepository.delete(appear);
     }
@@ -68,11 +71,12 @@ public class AppearService {
         appearRepository.save(appear);
     }
 
-    public Optional<Appear> get(Long id) {    //get appear
-        return appearRepository.findById(id);
+    public Optional<Appear> get(String email) {    //get appear
+        return appearRepository.findByEmail(email);
     }
 
     public void getAll() {    //get all appear
         appearRepository.findAll();
     }
+
 }
