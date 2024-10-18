@@ -3,6 +3,7 @@ package com.tarunainfosoft.controller;
 import com.tarunainfosoft.entity.Appear;
 import com.tarunainfosoft.repository.AppearRepository;
 import com.tarunainfosoft.service.AppearService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,7 +22,7 @@ public class AppearController {
     private AppearRepository appearRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Appear appear) {
+    public ResponseEntity<?> registerUser(@RequestBody Appear appear) throws MessagingException {
         String savedAppear = appearService.registerUser(appear);
         return ResponseEntity.ok(savedAppear);
     }
@@ -32,16 +33,21 @@ public class AppearController {
         return verified ? ResponseEntity.ok("User verified successfully") : ResponseEntity.badRequest().body("Invalid token");
     }
 
-    @PostMapping("/login")
+   /* @GetMapping("/login")
     public ResponseEntity<?> loginUser(@RequestParam String email, @RequestParam String password) {
         Appear user = appearService.loginUser(email, password);
         return user != null ? ResponseEntity.ok("Login successful") : ResponseEntity.badRequest().body("Invalid credentials");
+    }*/
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody Appear appear) {
+        Optional<Appear> user = appearService.loginUser(appear.getEmail(), appear.getPassword());
+        return user.map(value -> ResponseEntity.ok("Login Succesfully : " + value.getFirstName())).orElseGet(() -> ResponseEntity.badRequest().body("Invalid credentials"));
     }
 
-    @GetMapping("/getUser/{id}")
-    public ResponseEntity<Appear> getApiById(@PathVariable Long id){
-        Optional<Appear> appear = appearService.get(id);
-
+    @GetMapping("/getUser/{email}")
+    public ResponseEntity<Appear> getApiById(@PathVariable String email){
+        Optional<Appear> appear = appearService.get(email);
         return appear.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
